@@ -2,12 +2,12 @@
   "$schema": "./node_modules/wrangler/config-schema.json",
   "name": "affirm-hubspot-webhooks",
   "main": "src/index.ts",
-  "compatibility_date": "2026-02-10",
-
-  // Prevent Cloudflare dashboard secrets/vars from being overwritten by deploys
-  "keep_vars": true,
+  "compatibility_date": "2026-02-11",
 
   "workers_dev": true,
+
+  // Keeps secrets/vars you set in the Cloudflare Dashboard from being overwritten on deploy
+  "keep_vars": true,
 
   "d1_databases": [
     {
@@ -19,14 +19,17 @@
 
   "queues": {
     "producers": [
-      { "binding": "AFFIRM_QUEUE", "queue": "affirm-events" }
+      {
+        "binding": "AFFIRM_QUEUE",
+        "queue": "affirm-events"
+      }
     ],
     "consumers": [
       {
         "queue": "affirm-events",
         "max_batch_size": 10,
         "max_batch_timeout": 5,
-        "max_retries": 3,
+        "max_retries": 5,
         "dead_letter_queue": "affirm-events-dlq",
         "max_concurrency": 1
       }
@@ -34,8 +37,12 @@
   },
 
   "vars": {
+    "HS_EVENT_PREQUAL": "pe39758416_prequalified_affirm_application",
+    "HS_EVENT_OPEN": "pe39758416_open_financing_v2",
+
     "HS_FINANCING_OBJECT_TYPE_ID": "2-37647069",
     "HS_FINANCING_UNIQUE_PROPERTY": "checkout_id",
+
     "DEFAULT_PLATFORM": "Affirm",
     "LOG_LEVEL": "info"
   }
