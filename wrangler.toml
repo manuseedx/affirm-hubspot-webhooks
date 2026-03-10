@@ -1,0 +1,48 @@
+name = "affirm-hubspot-worker"
+main = "src/index.ts"
+compatibility_date = "2026-03-04"
+keep_vars = true
+
+[vars]
+SOURCE_NAME = "affirm"
+HUBSPOT_EVENT_ENDPOINT = "https://api.hubapi.com/events/v3/send"
+HUBSPOT_OBJECT_ENDPOINT = "https://api.hubapi.com/crm/v3/objects/2-37647069"
+HS_EVENT_PREQUAL = "pe39758416_prequalified_affirm_application"
+HS_EVENT_OPEN = "pe39758416_open_financing_v2"
+HS_FINANCING_OBJECT_TYPE_ID = "2-37647069"
+HS_FINANCING_UNIQUE_PROPERTY = "checkout_id"
+DEFAULT_PLATFORM = "Affirm"
+LOG_LEVEL = "info"
+DRY_RUN_HUBSPOT = "false"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "affirm-hubspot-d1"
+database_id = "104bb84e-ede2-4fd1-bdb6-a9fb1dc05a64"
+
+[[queues.producers]]
+binding = "EVENT_QUEUE"
+queue = "affirm-hubspot-events"
+
+[[queues.consumers]]
+queue = "affirm-hubspot-events"
+max_batch_size = 10
+max_batch_timeout = 5
+max_retries = 5
+dead_letter_queue = "affirm-hubspot-dlq"
+max_concurrency = 1
+
+[observability]
+enabled = false
+head_sampling_rate = 1
+
+[observability.logs]
+enabled = true
+head_sampling_rate = 1
+persist = true
+invocation_logs = true
+
+[observability.traces]
+enabled = false
+persist = true
+head_sampling_rate = 1
