@@ -18,7 +18,7 @@ DRY_RUN_HUBSPOT = "false"
 [[d1_databases]]
 binding = "DB"
 database_name = "affirm-hubspot-d1"
-database_id = "104bb84e-ede2-4fd1-bdb6-a9fb1dc05a64"
+database_id = "c0b9c3a4-296c-4c13-af78-36507b648f8d"
 
 [[queues.producers]]
 binding = "EVENT_QUEUE"
