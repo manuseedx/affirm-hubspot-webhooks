@@ -100,10 +100,28 @@ async function handleAffirmWebhook(request: Request, env: Env): Promise<Response
 async function handleQueue(batch: MessageBatch<QueueMessageBody>, env: Env): Promise<void> {
   for (const message of batch.messages) {
     const data = message.body;
+    console.info(
+      JSON.stringify({
+        stage: 'queue_received',
+        eventId: data.eventId,
+        eventType: data.eventType,
+        dedupeKey: data.dedupeKey
+      })
+    );
+
     try {
       const result = await sendToHubSpot(data, env);
 
       if (!result.ok) {
+        console.warn(
+          JSON.stringify({
+            stage: 'hubspot_delivery_failed',
+            eventId: data.eventId,
+            eventType: data.eventType,
+            responseCode: result.responseCode,
+            responseBody: result.responseBody
+          })
+        );
         await updateDeliveryStatus(env.DB, data.eventId, 'failed', {
           responseCode: result.responseCode,
           lastError: result.responseBody
@@ -117,12 +135,29 @@ async function handleQueue(batch: MessageBatch<QueueMessageBody>, env: Env): Pro
         continue;
       }
 
+      console.info(
+        JSON.stringify({
+          stage: 'hubspot_delivery_succeeded',
+          eventId: data.eventId,
+          eventType: data.eventType,
+          responseCode: result.responseCode,
+          responseBody: result.responseBody
+        })
+      );
       await updateDeliveryStatus(env.DB, data.eventId, 'delivered', {
         responseCode: result.responseCode
       });
       message.ack();
     } catch (error) {
       const messageText = error instanceof Error ? error.message : 'unknown error';
+      console.error(
+        JSON.stringify({
+          stage: 'queue_handler_exception',
+          eventId: data.eventId,
+          eventType: data.eventType,
+          error: messageText
+        })
+      );
       await updateDeliveryStatus(env.DB, data.eventId, 'failed', {
         lastError: messageText
       });

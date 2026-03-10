@@ -13,7 +13,7 @@ function parseAffirmPayload(rawBody: string, contentType: string): Record<string
     return parsed as Record<string, unknown>;
   }
 
-  const params = new URLSearchParams(rawBody);a
+  const params = new URLSearchParams(rawBody);
   const out: Record<string, unknown> = {};
   for (const [key, value] of params) {
     out[key] = value;
